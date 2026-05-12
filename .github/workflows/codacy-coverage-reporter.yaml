@@ -16,13 +16,13 @@ jobs:
 
       - name: Install dependencies
         working-directory: frontend
-        run: npm ci
+        run: npm install
 
-      - name: Run Vitest with coverage
+      - name: Run tests with coverage
         working-directory: frontend
         run: npm run test -- --coverage
 
-      - name: Debug coverage output
+      - name: Debug coverage files
         run: find . -name "lcov.info"
 
       - name: Upload coverage to Codacy
