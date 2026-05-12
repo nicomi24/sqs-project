@@ -5,15 +5,36 @@ on: ["push"]
 jobs:
   codacy-coverage-reporter:
     runs-on: ubuntu-latest
-    name: codacy-coverage-reporter
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Run codacy-coverage-reporter
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm install --legacy-peer-deps
+
+      - name: Install Vitest coverage package
+        working-directory: frontend
+        run: npm install -D @vitest/coverage-v8 --legacy-peer-deps
+
+      - name: Install Vitest Coverage
+        working-directory: frontend
+        run: npm install -D vitest@4.1.6 @vitest/coverage-v8@4.1.6
+
+      - name: Run tests with coverage
+        working-directory: frontend
+        run: npm run test -- --coverage
+
+      - name: Debug coverage files
+        run: find . -name "lcov.info"
+
+      - name: Upload coverage to Codacy
         uses: codacy/codacy-coverage-reporter-action@v1.3.0
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          # or
-          # api-token: ${{ secrets.CODACY_API_TOKEN }}
-          coverage-reports: "frontend/coverage/lcov.info"
-          # or a comma-separated list for multiple reports
-          # coverage-reports: <PATH_TO_REPORT>, <PATH_TO_REPORT>
+          coverage-reports: frontend/coverage/lcov.info
